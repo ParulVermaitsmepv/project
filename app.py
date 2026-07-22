@@ -2,8 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
-import os
+from datetime import datetime, timezone
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
@@ -13,7 +12,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view: str = 'login'
 
 
 # Database Models
@@ -26,12 +25,12 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(50), nullable=False)  # student, teaching_staff, non_teaching_staff
     enrollment_id = db.Column(db.String(100), unique=True)
     department = db.Column(db.String(100))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
-    def set_password(self, password):
+    def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
 
 
@@ -43,8 +42,8 @@ class FeesRecord(db.Model):
     due_date = db.Column(db.DateTime, nullable=False)
     paid_date = db.Column(db.DateTime)
     status = db.Column(db.String(20), default='pending')  # pending, paid, overdue
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     user = db.relationship('User', backref=db.backref('fees', lazy=True))
 
@@ -53,7 +52,7 @@ class FeeTransaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fees_record_id = db.Column(db.Integer, db.ForeignKey('fees_record.id'), nullable=False)
     amount_paid = db.Column(db.Float, nullable=False)
-    payment_date = db.Column(db.DateTime, default=datetime.utcnow)
+    payment_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     transaction_id = db.Column(db.String(100), unique=True)
     payment_method = db.Column(db.String(50))  # online, cash, cheque
     notes = db.Column(db.Text)
@@ -62,7 +61,7 @@ class FeeTransaction(db.Model):
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id: str) -> User | None:
     return User.query.get(int(user_id))
 
 
@@ -157,14 +156,14 @@ def pay_fees():
         transaction = FeeTransaction(
             fees_record_id=fees_id,
             amount_paid=amount,
-            transaction_id=f"TXN{datetime.utcnow().timestamp()}",
+            transaction_id=f"TXN{datetime.now(timezone.utc).timestamp()}",
             payment_method='online'
         )
         db.session.add(transaction)
 
         if fees_record.amount <= amount:
             fees_record.status = 'paid'
-            fees_record.paid_date = datetime.utcnow()
+            fees_record.paid_date = datetime.now(timezone.utc)
 
         db.session.commit()
         return jsonify({'success': True, 'message': 'Payment processed successfully'})
