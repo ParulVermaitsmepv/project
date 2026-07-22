@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - School Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h2 class="fw-bold">
+            <i class="bi bi-person-badge"></i> Welcome, {{ user.full_name }}!
+        </h2>
+        <p class="text-muted">Enrollment ID: <span class="badge bg-primary">{{ user.enrollment_id }}</span></p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left border-5" style="border-left-color: #3498db;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Enrollment ID</p>
+                        <h5 class="mb-0">{{ user.enrollment_id }}</h5>
+                    </div>
+                    <div style="font-size: 2rem; color: #3498db;">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left border-5" style="border-left-color: #27ae60;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Fees Status</p>
+                        <h5 class="mb-0">
+                            {% if total_due > 0 %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% else %}
+                                <span class="badge bg-success">Paid</span>
+                            {% endif %}
+                        </h5>
+                    </div>
+                    <div style="font-size: 2rem; color: #27ae60;">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left border-5" style="border-left-color: #e74c3c;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Amount Due</p>
+                        <h5 class="mb-0">₹{{ "%.2f"|format(total_due) }}</h5>
+                    </div>
+                    <div style="font-size: 2rem; color: #e74c3c;">
+                        <i class="bi bi-currency-rupee"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left border-5" style="border-left-color: #f39c12;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Fees Records</p>
+                        <h5 class="mb-0">{{ fees|length }}</h5>
+                    </div>
+                    <div style="font-size: 2rem; color: #f39c12;">
+                        <i class="bi bi-file-earmark"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fees Records -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="fw-bold mb-3"><i class="bi bi-credit-card"></i> Fees Records</h4>
+        {% if fees %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Paid Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fee in fees %}
+                            <tr>
+                                <td><strong>₹{{ "%.2f"|format(fee.amount) }}</strong></td>
+                                <td>{{ fee.due_date.strftime('%d-%m-%Y') }}</td>
+                                <td>
+                                    {% if fee.status == 'paid' %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Paid</span>
+                                    {% elif fee.status == 'overdue' %}
+                                        <span class="badge bg-danger"><i class="bi bi-exclamation-circle"></i> Overdue</span>
+                                    {% else %}
+                                        <span class="badge bg-warning"><i class="bi bi-clock"></i> Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if fee.paid_date %}
+                                        {{ fee.paid_date.strftime('%d-%m-%Y') }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if fee.status == 'pending' %}
+                                        <a href="{{ url_for('fees') }}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-credit-card"></i> Pay Now
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-secondary" disabled>Completed</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No fees records found.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Links -->
+<div class="row">
+    <div class="col-12">
+        <h4 class="fw-bold mb-3"><i class="bi bi-link"></i> Quick Links</h4>
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('fees') }}" class="btn btn-outline-primary">
+                <i class="bi bi-credit-card"></i> Pay Fees
+            </a>
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-house"></i> Home
+            </a>
+            <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#helpModal">
+                <i class="bi bi-question-circle"></i> Help
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-question-circle"></i> Help & Support</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>How to Pay Fees?</h6>
+                <p>Click on "Pay Fees" to view your fees details and make a payment online.</p>
+                <h6>How to Check My Status?</h6>
+                <p>You can see your fees status and pending amounts on this dashboard.</p>
+                <h6>Need More Help?</h6>
+                <p>Contact the administrative staff at admin@school.edu or visit the office.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

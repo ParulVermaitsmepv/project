@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Administrative Dashboard - School Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h2 class="fw-bold">
+            <i class="bi bi-person-gear"></i> Administrative Dashboard
+        </h2>
+        <p class="text-muted">Welcome back, {{ user.full_name }}! Manage school operations efficiently.</p>
+    </div>
+</div>
+
+<!-- Key Metrics -->
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left border-5" style="border-left-color: #3498db;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Total Students</p>
+                        <h5 class="mb-0">542</h5>
+                    </div>
+                    <div style="font-size: 2rem; color: #3498db;">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left border-5" style="border-left-color: #27ae60;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Fees Collected</p>
+                        <h5 class="mb-0">₹12.5L</h5>
+                    </div>
+                    <div style="font-size: 2rem; color: #27ae60;">
+                        <i class="bi bi-currency-rupee"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left border-5" style="border-left-color: #e74c3c;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Pending Fees</p>
+                        <h5 class="mb-0">₹2.3L</h5>
+                    </div>
+                    <div style="font-size: 2rem; color: #e74c3c;">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left border-5" style="border-left-color: #f39c12;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Staff Members</p>
+                        <h5 class="mb-0">45</h5>
+                    </div>
+                    <div style="font-size: 2rem; color: #f39c12;">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Operations -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="fw-bold mb-3"><i class="bi bi-sliders"></i> Admin Operations</h4>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-people-fill display-4" style="color: #3498db;"></i>
+                        </div>
+                        <h5 class="card-title">User Management</h5>
+                        <p class="card-text text-muted">Add, edit, or remove users</p>
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-credit-card display-4" style="color: #27ae60;"></i>
+                        </div>
+                        <h5 class="card-title">Fees Management</h5>
+                        <p class="card-text text-muted">View and manage fees records</p>
+                        <button class="btn btn-success btn-sm">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-file-earmark-text display-4" style="color: #e74c3c;"></i>
+                        </div>
+                        <h5 class="card-title">Generate Reports</h5>
+                        <p class="card-text text-muted">Create system reports</p>
+                        <button class="btn btn-danger btn-sm">Generate</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-gear display-4" style="color: #f39c12;"></i>
+                        </div>
+                        <h5 class="card-title">System Settings</h5>
+                        <p class="card-text text-muted">Configure system</p>
+                        <button class="btn btn-warning btn-sm">Configure</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Table -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="fw-bold mb-3"><i class="bi bi-bar-chart"></i> Financial Summary</h4>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Month</th>
+                        <th>Total Amount</th>
+                        <th>Collected</th>
+                        <th>Pending</th>
+                        <th>Collection Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>July 2024</td>
+                        <td>₹15,00,000</td>
+                        <td>₹12,50,000</td>
+                        <td>₹2,50,000</td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" style="width: 83%;">83%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>June 2024</td>
+                        <td>₹15,00,000</td>
+                        <td>₹14,80,000</td>
+                        <td>₹20,000</td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" style="width: 99%;">99%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>May 2024</td>
+                        <td>₹15,00,000</td>
+                        <td>₹14,50,000</td>
+                        <td>₹50,000</td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" style="width: 97%;">97%</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="row">
+    <div class="col-12">
+        <h4 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> Recent Transactions</h4>
+        <div class="list-group">
+            <a href="#" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">Student: Raj Kumar</h6>
+                    <span class="badge bg-success">₹5,000</span>
+                </div>
+                <p class="mb-1 text-muted">Payment received - Today at 2:30 PM</p>
+                <small>Transaction ID: TXN001</small>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">Student: Priya Singh</h6>
+                    <span class="badge bg-success">₹10,000</span>
+                </div>
+                <p class="mb-1 text-muted">Payment received - Today at 1:15 PM</p>
+                <small>Transaction ID: TXN002</small>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">Student: Arjun Patel</h6>
+                    <span class="badge bg-warning">Pending</span>
+                </div>
+                <p class="mb-1 text-muted">Fee payment due - Overdue by 5 days</p>
+                <small>Amount: ₹7,500</small>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
