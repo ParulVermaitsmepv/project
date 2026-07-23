@@ -4,7 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timezone
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='styles', static_url_path='/static')
 app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -13,6 +13,11 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view: str = 'login'
+
+
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now(timezone.utc)}
 
 
 # Database Models
