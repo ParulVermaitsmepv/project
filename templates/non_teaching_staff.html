@@ -3,27 +3,35 @@
 {% block title %}Administrative Dashboard - School Management System{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12 mb-4">
-        <h2 class="fw-bold">
-            <i class="bi bi-person-gear"></i> Administrative Dashboard
+<div class="row align-items-center mb-4">
+    <div class="col-md-7">
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-person-gear text-primary"></i> Administrative Dashboard
         </h2>
-        <p class="text-muted">Welcome back, {{ user.full_name }}! Manage school operations efficiently.</p>
+        <p class="text-muted mb-0">Welcome back, {{ user.full_name }}! Overview of institutional operations & financials.</p>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('admin_users') }}" class="btn btn-primary me-2">
+            <i class="bi bi-people-fill me-1"></i> User Management
+        </a>
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#settingsModal">
+            <i class="bi bi-gear-fill me-1"></i> System Settings
+        </button>
     </div>
 </div>
 
-<!-- Key Metrics -->
+<!-- Key Metrics Cards -->
 <div class="row g-4 mb-5">
     <div class="col-md-6 col-lg-3">
-        <div class="card border-left border-5" style="border-left-color: #3498db;">
+        <div class="card border-left-5 border-primary-accent">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <p class="text-muted mb-1">Total Students</p>
-                        <h5 class="mb-0">542</h5>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase">Total Students</p>
+                        <h3 class="fw-bold mb-0 text-dark">{{ students_count }}</h3>
                     </div>
-                    <div style="font-size: 2rem; color: #3498db;">
-                        <i class="bi bi-people-fill"></i>
+                    <div class="fs-1 text-primary">
+                        <i class="bi bi-mortarboard-fill"></i>
                     </div>
                 </div>
             </div>
@@ -31,15 +39,15 @@
     </div>
 
     <div class="col-md-6 col-lg-3">
-        <div class="card border-left border-5" style="border-left-color: #27ae60;">
+        <div class="card border-left-5 border-success-accent">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <p class="text-muted mb-1">Fees Collected</p>
-                        <h5 class="mb-0">₹12.5L</h5>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase">Fees Collected</p>
+                        <h3 class="fw-bold mb-0 text-success">₹{{ "%.2f"|format(total_collected) }}</h3>
                     </div>
-                    <div style="font-size: 2rem; color: #27ae60;">
-                        <i class="bi bi-currency-rupee"></i>
+                    <div class="fs-1 text-success">
+                        <i class="bi bi-cash-stack"></i>
                     </div>
                 </div>
             </div>
@@ -47,15 +55,15 @@
     </div>
 
     <div class="col-md-6 col-lg-3">
-        <div class="card border-left border-5" style="border-left-color: #e74c3c;">
+        <div class="card border-left-5 border-danger-accent">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <p class="text-muted mb-1">Pending Fees</p>
-                        <h5 class="mb-0">₹2.3L</h5>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase">Pending / Overdue</p>
+                        <h3 class="fw-bold mb-0 text-danger">₹{{ "%.2f"|format(total_pending) }}</h3>
                     </div>
-                    <div style="font-size: 2rem; color: #e74c3c;">
-                        <i class="bi bi-exclamation-circle"></i>
+                    <div class="fs-1 text-danger">
+                        <i class="bi bi-exclamation-octagon-fill"></i>
                     </div>
                 </div>
             </div>
@@ -63,15 +71,15 @@
     </div>
 
     <div class="col-md-6 col-lg-3">
-        <div class="card border-left border-5" style="border-left-color: #f39c12;">
+        <div class="card border-left-5 border-warning-accent">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <p class="text-muted mb-1">Staff Members</p>
-                        <h5 class="mb-0">45</h5>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase">Teaching Staff</p>
+                        <h3 class="fw-bold mb-0 text-dark">{{ staff_count }}</h3>
                     </div>
-                    <div style="font-size: 2rem; color: #f39c12;">
-                        <i class="bi bi-briefcase"></i>
+                    <div class="fs-1 text-warning">
+                        <i class="bi bi-briefcase-fill"></i>
                     </div>
                 </div>
             </div>
@@ -79,59 +87,59 @@
     </div>
 </div>
 
-<!-- Admin Operations -->
-<div class="row mb-4">
+<!-- Admin Quick Action Cards -->
+<div class="row mb-5">
     <div class="col-12">
-        <h4 class="fw-bold mb-3"><i class="bi bi-sliders"></i> Admin Operations</h4>
-        <div class="row g-3">
+        <h4 class="fw-bold mb-3"><i class="bi bi-sliders text-primary me-2"></i> Operational Tools</h4>
+        <div class="row g-4">
             <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <i class="bi bi-people-fill display-4" style="color: #3498db;"></i>
+                <div class="card text-center h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="bg-light rounded-circle d-inline-flex p-3 mb-3 text-primary">
+                            <i class="bi bi-people-fill fs-2"></i>
                         </div>
-                        <h5 class="card-title">User Management</h5>
-                        <p class="card-text text-muted">Add, edit, or remove users</p>
-                        <a href="{{ url_for('admin_users') }}" class="btn btn-primary btn-sm">Manage</a>
+                        <h5 class="fw-bold">User Management</h5>
+                        <p class="text-muted small mb-3">Add, edit, assign roles, or delete users across all departments</p>
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-primary btn-sm w-100"><i class="bi bi-arrow-right me-1"></i> Manage Users</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <i class="bi bi-credit-card display-4" style="color: #27ae60;"></i>
+                <div class="card text-center h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="bg-light rounded-circle d-inline-flex p-3 mb-3 text-success">
+                            <i class="bi bi-credit-card-2-front fs-2"></i>
                         </div>
-                        <h5 class="card-title">Fees Management</h5>
-                        <p class="card-text text-muted">View and manage fees records</p>
-                        <button class="btn btn-success btn-sm">View</button>
+                        <h5 class="fw-bold">Create Fee Invoice</h5>
+                        <p class="text-muted small mb-3">Issue tuition & administrative fee invoices to students</p>
+                        <button class="btn btn-success btn-sm w-100" data-bs-toggle="modal" data-bs-target="#createFeeModal"><i class="bi bi-plus-circle me-1"></i> Issue Fee</button>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <i class="bi bi-file-earmark-text display-4" style="color: #e74c3c;"></i>
+                <div class="card text-center h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="bg-light rounded-circle d-inline-flex p-3 mb-3 text-danger">
+                            <i class="bi bi-file-earmark-bar-graph fs-2"></i>
                         </div>
-                        <h5 class="card-title">Generate Reports</h5>
-                        <p class="card-text text-muted">Create system reports</p>
-                        <button class="btn btn-danger btn-sm">Generate</button>
+                        <h5 class="fw-bold">Reports & Analytics</h5>
+                        <p class="text-muted small mb-3">Generate financial, attendance, and student performance reports</p>
+                        <button class="btn btn-danger btn-sm w-100" data-bs-toggle="modal" data-bs-target="#reportModal"><i class="bi bi-download me-1"></i> Generate</button>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6 col-lg-3">
-                <div class="card text-center h-100">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <i class="bi bi-gear display-4" style="color: #f39c12;"></i>
+                <div class="card text-center h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="bg-light rounded-circle d-inline-flex p-3 mb-3 text-warning">
+                            <i class="bi bi-gear-wide-connected fs-2"></i>
                         </div>
-                        <h5 class="card-title">System Settings</h5>
-                        <p class="card-text text-muted">Configure system</p>
-                        <button class="btn btn-warning btn-sm">Configure</button>
+                        <h5 class="fw-bold">System Configuration</h5>
+                        <p class="text-muted small mb-3">Configure institution name, academic session year & contact info</p>
+                        <button class="btn btn-warning text-dark btn-sm w-100" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="bi bi-sliders me-1"></i> Configure</button>
                     </div>
                 </div>
             </div>
@@ -139,91 +147,231 @@
     </div>
 </div>
 
-<!-- Quick Stats Table -->
-<div class="row mb-4">
-    <div class="col-12">
-        <h4 class="fw-bold mb-3"><i class="bi bi-bar-chart"></i> Financial Summary</h4>
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Month</th>
-                        <th>Total Amount</th>
-                        <th>Collected</th>
-                        <th>Pending</th>
-                        <th>Collection Rate</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>July 2024</td>
-                        <td>₹15,00,000</td>
-                        <td>₹12,50,000</td>
-                        <td>₹2,50,000</td>
-                        <td>
-                            <div class="progress" style="height: 20px;">
-                                <div class="progress-bar bg-success" style="width: 83%;">83%</div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>June 2024</td>
-                        <td>₹15,00,000</td>
-                        <td>₹14,80,000</td>
-                        <td>₹20,000</td>
-                        <td>
-                            <div class="progress" style="height: 20px;">
-                                <div class="progress-bar bg-success" style="width: 99%;">99%</div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>May 2024</td>
-                        <td>₹15,00,000</td>
-                        <td>₹14,50,000</td>
-                        <td>₹50,000</td>
-                        <td>
-                            <div class="progress" style="height: 20px;">
-                                <div class="progress-bar bg-success" style="width: 97%;">97%</div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+<!-- Financial Transactions & Notices -->
+<div class="row g-4">
+    <!-- Recent Fee Transactions -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-receipt text-primary me-2"></i> Recent Payment Transactions</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Txn ID</th>
+                            <th>Student</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if recent_transactions %}
+                            {% for txn in recent_transactions %}
+                                <tr>
+                                    <td><code>{{ txn.transaction_id }}</code></td>
+                                    <td class="fw-semibold">{{ txn.fees_record.student_name if txn.fees_record else 'Student' }}</td>
+                                    <td class="text-success fw-bold">₹{{ "%.2f"|format(txn.amount_paid) }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ txn.payment_method or 'online' }}</span></td>
+                                    <td><small class="text-muted">{{ txn.payment_date.strftime('%d-%m-%Y %H:%M') if txn.payment_date else '' }}</small></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No recent payment transactions recorded.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active System Config Summary & Announcements -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-info-circle text-info me-2"></i> Institution Configuration</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush small">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">School Name:</span>
+                        <strong class="text-dark">{{ settings.get('school_name', 'School Management System') }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Academic Year:</span>
+                        <span class="badge bg-primary">{{ settings.get('academic_year', '2024 - 2025') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Contact Email:</span>
+                        <code>{{ settings.get('contact_email', 'admin@school.edu') }}</code>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Default Quarterly Fee:</span>
+                        <strong class="text-success">₹{{ settings.get('default_fee', '5000.00') }}</strong>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Recent Transactions -->
-<div class="row">
-    <div class="col-12">
-        <h4 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> Recent Transactions</h4>
-        <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">Student: Raj Kumar</h6>
-                    <span class="badge bg-success">₹5,000</span>
+<!-- Modal: Issue Fee Invoice -->
+<div class="modal fade" id="createFeeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-credit-card text-success me-2"></i> Issue Fee Invoice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form onsubmit="submitCreateFee(event)">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="feeStudentId" class="form-label fw-semibold">Select Student</label>
+                        <select class="form-select" id="feeStudentId" required>
+                            <option value="">Select student...</option>
+                            {% for s in user.query.filter_by(role='student').all() %}
+                                <option value="{{ s.id }}">{{ s.full_name }} ({{ s.enrollment_id or s.username }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="feeAmount" class="form-label fw-semibold">Fee Amount (₹)</label>
+                        <input type="number" step="100" class="form-control" id="feeAmount" required value="5000" min="100">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="feeDueDays" class="form-label fw-semibold">Due In (Days)</label>
+                        <input type="number" class="form-control" id="feeDueDays" required value="30" min="1">
+                    </div>
                 </div>
-                <p class="mb-1 text-muted">Payment received - Today at 2:30 PM</p>
-                <small>Transaction ID: TXN001</small>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">Student: Priya Singh</h6>
-                    <span class="badge bg-success">₹10,000</span>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i> Issue Fee Invoice</button>
                 </div>
-                <p class="mb-1 text-muted">Payment received - Today at 1:15 PM</p>
-                <small>Transaction ID: TXN002</small>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">Student: Arjun Patel</h6>
-                    <span class="badge bg-warning">Pending</span>
-                </div>
-                <p class="mb-1 text-muted">Fee payment due - Overdue by 5 days</p>
-                <small>Amount: ₹7,500</small>
-            </a>
+            </form>
         </div>
     </div>
 </div>
+
+<!-- Modal: System Settings -->
+<div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-gear-wide-connected text-primary me-2"></i> System Configuration</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form onsubmit="submitSettings(event)">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="settingSchoolName" class="form-label fw-semibold">School Name</label>
+                        <input type="text" class="form-control" id="settingSchoolName" required value="{{ settings.get('school_name', 'Greenwood High International School') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="settingYear" class="form-label fw-semibold">Academic Session Year</label>
+                        <input type="text" class="form-control" id="settingYear" required value="{{ settings.get('academic_year', '2024 - 2025') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="settingEmail" class="form-label fw-semibold">System Contact Email</label>
+                        <input type="email" class="form-control" id="settingEmail" required value="{{ settings.get('contact_email', 'admin@greenwood.edu') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="settingFee" class="form-label fw-semibold">Default Quarterly Tuition Fee (₹)</label>
+                        <input type="text" class="form-control" id="settingFee" required value="{{ settings.get('default_fee', '5000.00') }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Save Configuration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Reports Export -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-file-earmark-bar-graph text-danger me-2"></i> Generate System Reports</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Select the report type you wish to export:</p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('export_users') }}" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-people-fill me-2"></i> User Accounts & Roles (JSON)
+                    </a>
+                    <button type="button" class="btn btn-outline-success text-start" onclick="alert('Financial summary ready. Total collected: ₹{{ total_collected }}, Pending: ₹{{ total_pending }}');">
+                        <i class="bi bi-cash-coin me-2"></i> Financial Audit Summary
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function submitCreateFee(e) {
+    e.preventDefault();
+    const data = {
+        student_id: document.getElementById('feeStudentId').value,
+        amount: document.getElementById('feeAmount').value,
+        due_days: document.getElementById('feeDueDays').value
+    };
+
+    fetch('/api/fees/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if(res.success) {
+            alert('Fee invoice created successfully!');
+            window.location.reload();
+        } else {
+            alert('Error: ' + res.message);
+        }
+    })
+    .catch(err => alert('Error: ' + err));
+}
+
+function submitSettings(e) {
+    e.preventDefault();
+    const data = {
+        school_name: document.getElementById('settingSchoolName').value,
+        academic_year: document.getElementById('settingYear').value,
+        contact_email: document.getElementById('settingEmail').value,
+        default_fee: document.getElementById('settingFee').value
+    };
+
+    fetch('/api/settings/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if(res.success) {
+            alert('System settings updated successfully!');
+            window.location.reload();
+        } else {
+            alert('Error: ' + res.message);
+        }
+    })
+    .catch(err => alert('Error: ' + err));
+}
+</script>
 {% endblock %}
