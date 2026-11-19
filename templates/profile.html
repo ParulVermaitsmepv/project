@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Account Profile - School Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <h2 class="fw-bold mb-0"><i class="bi bi-person-gear"></i> Account Profile</h2>
+        </div>
+
+        <div class="row g-4">
+            <!-- Account Details Card -->
+            <div class="col-md-5">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="card-body">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 80px; height: 80px; font-size: 2.2rem; font-weight: 700;">
+                            {{ user.full_name[0] if user.full_name else 'U' }}
+                        </div>
+                        <h4 class="fw-bold mb-1">{{ user.full_name }}</h4>
+                        <p class="badge bg-primary text-capitalize fs-6 mb-3">{{ user.role.replace('_', ' ') }}</p>
+                        
+                        <hr class="my-3">
+
+                        <div class="text-start small">
+                            <p class="mb-2"><strong><i class="bi bi-person text-muted me-2"></i> Username:</strong> {{ user.username }}</p>
+                            <p class="mb-2"><strong><i class="bi bi-envelope text-muted me-2"></i> Email:</strong> {{ user.email }}</p>
+                            {% if user.enrollment_id %}
+                                <p class="mb-2"><strong><i class="bi bi-card-heading text-muted me-2"></i> Enrollment ID:</strong> {{ user.enrollment_id }}</p>
+                            {% endif %}
+                            {% if user.department %}
+                                <p class="mb-2"><strong><i class="bi bi-building text-muted me-2"></i> Department:</strong> {{ user.department }}</p>
+                            {% endif %}
+                            <p class="mb-0"><strong><i class="bi bi-calendar text-muted me-2"></i> Joined:</strong> {{ user.created_at.strftime('%d-%m-%Y') if user.created_at else 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Password Card -->
+            <div class="col-md-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-shield-lock me-2 text-primary"></i> Change Password</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('profile') }}">
+                            <div class="mb-3">
+                                <label for="current_password" class="form-label fw-semibold">Current Password</label>
+                                <input type="password" class="form-control" id="current_password" name="current_password" required placeholder="Enter current password">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="new_password" class="form-label fw-semibold">New Password</label>
+                                <input type="password" class="form-control" id="new_password" name="new_password" required minlength="6" placeholder="At least 6 characters">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="confirm_password" class="form-label fw-semibold">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required placeholder="Re-enter new password">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-check-circle me-1"></i> Update Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

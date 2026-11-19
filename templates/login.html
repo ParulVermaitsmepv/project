@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Login - School Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white py-4 text-center">
+                <h3 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Login</h3>
+                <p class="text-light mb-0 mt-2">School Management System</p>
+            </div>
+
+            <div class="card-body p-4">
+                {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endif %}
+
+                <form method="POST" class="needs-validation" novalidate>
+                    <!-- User Type Selection -->
+                    <div class="mb-3">
+                        <label for="user_type" class="form-label fw-bold">
+                            <i class="bi bi-people-fill"></i> User Type
+                        </label>
+                        <select class="form-select form-select-lg" id="user_type" name="user_type" required>
+                            <option value="" disabled selected>Select your role...</option>
+                            <option value="student">
+                                <i class="bi bi-person-badge"></i> Student
+                            </option>
+                            <option value="teaching_staff">
+                                <i class="bi bi-person-workspace"></i> Teaching Staff
+                            </option>
+                            <option value="non_teaching_staff">
+                                <i class="bi bi-person-gear"></i> Administrative Staff
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">Please select a user type.</div>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-bold">
+                            <i class="bi bi-person"></i> Username
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="username" name="username"
+                            placeholder="Enter your username" required>
+                        <div class="invalid-feedback">Username is required.</div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-bold">
+                            <i class="bi bi-lock"></i> Password
+                        </label>
+                        <input type="password" class="form-control form-control-lg" id="password" name="password"
+                            placeholder="Enter your password" required>
+                        <div class="invalid-feedback">Password is required.</div>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </button>
+                </form>
+
+                <hr>
+
+                <!-- Demo Credentials -->
+                <div class="alert alert-info alert-sm" role="alert">
+                    <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Demo Credentials</h6>
+                    <small>
+                        <strong>Student:</strong> student1 / password123<br>
+                        <strong>Teaching Staff:</strong> staff1 / password123<br>
+                        <strong>Admin:</strong> admin1 / password123
+                    </small>
+                </div>
+            </div>
+
+            <div class="card-footer bg-light text-center py-3">
+                <p class="mb-0 text-muted">
+                    Don't have an account? <a href="{{ url_for('home') }}" class="text-decoration-none fw-bold">Contact Administrator</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Bootstrap form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+{% endblock %}

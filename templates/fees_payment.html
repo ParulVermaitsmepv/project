@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}Fees Payment - School Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="mb-4">
+            <h2 class="fw-bold">
+                <i class="bi bi-credit-card"></i> Fees Payment
+            </h2>
+            <p class="text-muted">Pay your fees online securely</p>
+        </div>
+
+        {% if fees %}
+            <div class="row g-4 mb-4">
+                <!-- Fees Details -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="bi bi-file-earmark"></i> Fees Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td class="text-muted">Student Name:</td>
+                                    <td class="fw-bold">{{ current_user.full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Enrollment ID:</td>
+                                    <td class="fw-bold">{{ current_user.enrollment_id }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Amount:</td>
+                                    <td class="fw-bold text-primary">₹{{ "%.2f"|format(fees.amount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Due Date:</td>
+                                    <td class="fw-bold">{{ fees.due_date.strftime('%d-%m-%Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Status:</td>
+                                    <td>
+                                        {% if fees.status == 'paid' %}
+                                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Paid</span>
+                                        {% elif fees.status == 'overdue' %}
+                                            <span class="badge bg-danger"><i class="bi bi-exclamation-circle"></i> Overdue</span>
+                                        {% else %}
+                                            <span class="badge bg-warning"><i class="bi bi-clock"></i> Pending</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Status -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Payment Status</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if fees.status == 'paid' %}
+                                <div class="alert alert-success" role="alert">
+                                    <i class="bi bi-check-circle"></i>
+                                    <strong>Payment Successful!</strong>
+                                    <p class="mb-1 mt-2">Your fees have been paid successfully.</p>
+                                    <small>Payment Date: {{ fees.paid_date.strftime('%d-%m-%Y %H:%M') }}</small>
+                                </div>
+                            {% elif fees.status == 'overdue' %}
+                                <div class="alert alert-danger" role="alert">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <strong>Payment Overdue!</strong>
+                                    <p class="mb-1 mt-2">Your payment is overdue. Please pay immediately to avoid penalties.</p>
+                                    <small>Due Date: {{ fees.due_date.strftime('%d-%m-%Y') }}</small>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="bi bi-clock"></i>
+                                    <strong>Payment Pending</strong>
+                                    <p class="mb-1 mt-2">Your fees payment is pending. Please complete the payment below.</p>
+                                    <small>Days Remaining: {{ ((fees.due_date.date() - now.date()).days) }}</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            {% if fees.status != 'paid' %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-lock"></i> Payment Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="paymentForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="amount" class="form-label">Payment Amount <span class="text-danger">*</span></label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" class="form-control" id="amount" name="amount" 
+                                            value="{{ "%.2f"|format(fees.amount) }}" required min="0" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="payment_method" class="form-label">Payment Method <span class="text-danger">*</span></label>
+                                    <select class="form-select form-select-lg" id="payment_method" name="payment_method" required>
+                                        <option value="">Select payment method...</option>
+                                        <option value="credit_card">Credit Card</option>
+                                        <option value="debit_card">Debit Card</option>
+                                        <option value="upi">UPI</option>
+                                        <option value="bank_transfer">Bank Transfer</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Card Details (shown if credit/debit card selected) -->
+                            <div id="cardDetails" style="display: none;">
+                                <hr>
+                                <h6 class="fw-bold mb-3"><i class="bi bi-credit-card"></i> Card Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="cardholderName" class="form-label">Cardholder Name</label>
+                                    <input type="text" class="form-control" id="cardholderName" placeholder="Full name on card">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="cardNumber" class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="expiryDate" class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cvv" class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="3">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- UPI Details (shown if UPI selected) -->
+                            <div id="upiDetails" style="display: none;">
+                                <hr>
+                                <h6 class="fw-bold mb-3"><i class="bi bi-phone"></i> UPI Information</h6>
+                                <div class="mb-3">
+                                    <label for="upiId" class="form-label">UPI ID</label>
+                                    <input type="text" class="form-control" id="upiId" placeholder="name@upi">
+                                </div>
+                            </div>
+
+                            <!-- Terms and Conditions -->
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label" for="termsCheck">
+                                    I agree to the terms and conditions and privacy policy
+                                </label>
+                            </div>
+
+                            <!-- Amount Summary -->
+                            <div class="alert alert-light border mb-4">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p class="mb-1 text-muted">Total Amount:</p>
+                                        <h5 class="mb-0" id="totalAmount">₹{{ "%.2f"|format(fees.amount) }}</h5>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <p class="mb-1 text-muted">Processing Fee:</p>
+                                        <h5 class="mb-0">₹0.00</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary btn-lg" onclick="processPayment()">
+                                    <i class="bi bi-shield-check"></i> Proceed to Payment
+                                </button>
+                                <a href="{{ url_for('student_dashboard') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-success alert-lg" role="alert">
+                    <i class="bi bi-check-circle"></i>
+                    <strong>Payment Completed!</strong>
+                    <p class="mb-0 mt-2">Your fees have been successfully paid. Thank you!</p>
+                </div>
+                <a href="{{ url_for('student_dashboard') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            {% endif %}
+
+            <!-- Payment History -->
+            {% if fees.transactions %}
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="bi bi-receipt"></i> Payment History</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in fees.transactions %}
+                                    <tr>
+                                        <td><code>{{ transaction.transaction_id }}</code></td>
+                                        <td>₹{{ "%.2f"|format(transaction.amount_paid) }}</td>
+                                        <td>{{ transaction.payment_method or 'Online' }}</td>
+                                        <td>{{ transaction.payment_date.strftime('%d-%m-%Y %H:%M') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info alert-lg" role="alert">
+                <i class="bi bi-info-circle"></i>
+                <strong>No Fees Found</strong>
+                <p class="mb-0 mt-2">There are no fees records associated with your account. Please contact the administrative office if you believe this is an error.</p>
+            </div>
+            <a href="{{ url_for('student_dashboard') }}" class="btn btn-primary btn-lg">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Update amount display
+    document.getElementById('amount').addEventListener('change', function() {
+        document.getElementById('totalAmount').textContent = '₹' + parseFloat(this.value).toFixed(2);
+    });
+
+    // Show/hide payment method details
+    document.getElementById('payment_method').addEventListener('change', function() {
+        document.getElementById('cardDetails').style.display = 'none';
+        document.getElementById('upiDetails').style.display = 'none';
+        
+        if (this.value === 'credit_card' || this.value === 'debit_card') {
+            document.getElementById('cardDetails').style.display = 'block';
+        } else if (this.value === 'upi') {
+            document.getElementById('upiDetails').style.display = 'block';
+        }
+    });
+
+    // Format card number
+    document.getElementById('cardNumber').addEventListener('input', function() {
+        this.value = this.value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+    });
+
+    // Format expiry date
+    document.getElementById('expiryDate').addEventListener('input', function() {
+        if (this.value.length === 2 && !this.value.includes('/')) {
+            this.value += '/';
+        }
+    });
+
+    // Process payment
+    function processPayment() {
+        const form = document.getElementById('paymentForm');
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const amount = document.getElementById('amount').value;
+        const feesId = {{ fees.id }};
+
+        // Show loading
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+
+        // Simulate API call
+        fetch('{{ url_for("pay_fees") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                amount: amount,
+                fees_id: feesId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Payment successful!');
+                window.location.reload();
+            } else {
+                alert('Payment failed: ' + data.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-shield-check"></i> Proceed to Payment';
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-shield-check"></i> Proceed to Payment';
+        });
+    }
+</script>
+{% endblock %}

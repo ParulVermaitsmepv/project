@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - School Management System{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-person-badge text-primary"></i> Welcome back, {{ user.full_name }}!
+        </h2>
+        <p class="text-muted mb-0">Enrollment ID: <span class="badge bg-primary fs-6">{{ user.enrollment_id or 'STU001' }}</span></p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('fees') }}" class="btn btn-primary">
+            <i class="bi bi-credit-card me-1"></i> Pay Tuition Fees
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left-5 border-primary-accent">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase">Enrollment ID</p>
+                        <h4 class="fw-bold mb-0 text-dark">{{ user.enrollment_id or 'STU001' }}</h4>
+                    </div>
+                    <div class="fs-1 text-primary">
+                        <i class="bi bi-card-heading"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left-5 border-success-accent">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase">Fees Status</p>
+                        <h4 class="mb-0">
+                            {% if total_due > 0 %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i> Due</span>
+                            {% else %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Paid</span>
+                            {% endif %}
+                        </h4>
+                    </div>
+                    <div class="fs-1 text-success">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left-5 border-danger-accent">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase">Amount Pending</p>
+                        <h4 class="fw-bold mb-0 text-danger">₹{{ "%.2f"|format(total_due) }}</h4>
+                    </div>
+                    <div class="fs-1 text-danger">
+                        <i class="bi bi-currency-rupee"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-left-5 border-warning-accent">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted small mb-1 fw-semibold text-uppercase">Attendance Rate</p>
+                        <h4 class="fw-bold mb-0 text-dark">{{ attendance_rate }}%</h4>
+                    </div>
+                    <div class="fs-1 text-warning">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Sections: Fees Records & Academic Grades -->
+<div class="row g-4 mb-5">
+    <!-- Fees Records -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="bi bi-credit-card text-primary me-2"></i> Fees Statement & Records</h5>
+                <a href="{{ url_for('fees') }}" class="btn btn-sm btn-outline-primary">View Details</a>
+            </div>
+            <div class="card-body p-0">
+                {% if fees %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Paid Date</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fee in fees %}
+                                    <tr>
+                                        <td class="fw-bold text-dark">₹{{ "%.2f"|format(fee.amount) }}</td>
+                                        <td>{{ fee.due_date.strftime('%d-%m-%Y') }}</td>
+                                        <td>
+                                            {% if fee.status == 'paid' %}
+                                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Paid</span>
+                                            {% elif fee.status == 'overdue' %}
+                                                <span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i> Overdue</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i> Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if fee.paid_date %}
+                                                <small class="text-muted">{{ fee.paid_date.strftime('%d-%m-%Y') }}</small>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            {% if fee.status != 'paid' %}
+                                                <a href="{{ url_for('fees') }}" class="btn btn-sm btn-primary">
+                                                    Pay Now
+                                                </a>
+                                            {% else %}
+                                                <span class="badge bg-light text-secondary border">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-info-circle fs-3 text-info d-block mb-2"></i>
+                        No fee invoices generated yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Grades / Academic Results -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-journal-check text-success me-2"></i> Academic Performance</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if grades %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Assessment</th>
+                                    <th>Score</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for g in grades %}
+                                    <tr>
+                                        <td class="fw-semibold">{{ g.subject }}</td>
+                                        <td><small class="text-muted">{{ g.exam_title }}</small></td>
+                                        <td class="fw-bold">{{ g.score }}/{{ g.max_score }}</td>
+                                        <td><span class="badge bg-primary">{{ g.grade_letter or 'A' }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-file-earmark-text fs-3 text-muted d-block mb-2"></i>
+                        No academic grades published yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Announcements for Student -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-bell text-warning me-2"></i> Student Announcements</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% if notices %}
+                        {% for notice in notices %}
+                            <div class="list-group-item p-3">
+                                <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                    <h6 class="fw-bold mb-0 text-dark">{{ notice.title }}</h6>
+                                    <span class="badge bg-light text-dark border">{{ notice.category }}</span>
+                                </div>
+                                <p class="mb-1 text-secondary small">{{ notice.content }}</p>
+                                <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> Posted on {{ notice.created_at.strftime('%d-%m-%Y') if notice.created_at else '' }}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-4 text-center text-muted">No announcements posted for students at this time.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
