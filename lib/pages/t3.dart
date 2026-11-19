@@ -50,6 +50,36 @@ class t3 extends StatelessWidget{
         ],
       ),
       ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.blue,
+        onTap: (index){
+        if(index==0){
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder:(context)=>const Homepage()),
+            (route)=>false,
+          );
+        }
+        },
+        items: const[
+          BottomNavigationBarItem(
+            icon:Icon(Icons.home),
+            label:"HOME", 
+            ),
+            BottomNavigationBarItem(
+              
+              icon:Icon(Icons.table_restaurant),
+              label: "TABLE", 
+              ),
+            BottomNavigationBarItem(
+              
+              icon:Icon(Icons.person),
+              label: "Profile", 
+              ),
+
+        ],
+        ),
     );
   }
 }

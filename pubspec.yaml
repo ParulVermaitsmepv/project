@@ -58,6 +58,14 @@ flutter:
   uses-material-design: true
   assets:
    - assets/images/spicymist.jpg
+   - assets/images/tea.jpg
+   - assets/images/ice.jpg
+   - assets/images/gt.jpg
+   - assets/images/lt.jpg
+   - assets/images/mk.jpg
+   - assets/images/kulhar.jpg
+   - assets/images/coffee.jpg
+   - assets/images/bt.jpg
 
 
   # To add assets to your application, add an assets section, like this:
